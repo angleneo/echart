@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>拖拽--Clone</title>
+<style type="text/css"> 
+body,div{margin:0;padding:0;}
+.pppp div{position:absolute;cursor:move;}
+#drag1{ top:100;left:350px;width:350px;height:185px;}
+#tickekt2{
+
+}
+#tempbox{opacity:0.3;filter:alpha(opacity=30);}
+</style>
+<script src="js/echarts.min.js" type="text/javascript"></script>
+<script type="text/javascript"> 
+var zIndex = 1;
+window.onload = function ()
+{
+    var oDrag1 = document.getElementById("drag1");
+
+    var oZone=oDrag1.parentNode;
+    var max={maxX:oZone.offsetLeft+oZone.clientWidth,maxY:oZone.offsetTop+oZone.clientHeight};
+    drag(oDrag1,max);
+      initecharts();
+
+};
+function initecharts(data){
+			  var myChart = echarts.init(document.getElementById('tickekt1'));
+				option = {
+					title: {
+					        text: '支付渠道统计'
+					   },
+				    color: ['#3398DB'],
+				    tooltip : {
+				        trigger: 'axis',
+				        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+				            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+				        }
+				    },
+				    grid: {
+				        left: '3%',
+				        right: '4%',
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis : [
+				        {
+				            type : 'category',
+				            data : ['app', '微信', '官网', '电商', '现场购票'],
+				            axisTick: {
+				                alignWithLabel: true
+				            }           
+				        }
+				    ],
+				    yAxis : [
+				        {
+				            type : 'value'
+				        }
+				    ],
+				    series : [
+				        {
+				            name:'直接访问',
+				            type:'bar',
+				            itemStyle : {			            	
+				            	 normal: {
+　　　　　　　　　　　　　　//好，这里就是重头戏了，定义一个list，然后根据所以取得不同的值，这样就实现了，
+                        color: function(params) {
+                            // build a color map as your need.
+                            var colorList = [
+                              '#C1232B','#B5C334','blue','#E87C25','#27727B',              
+                            ];
+                            return colorList[params.dataIndex]
+                        },
+　　　　　　　　　　　　　　//以下为是否显示，显示位置和显示格式的设置了
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: '{b}\n{c}'
+                        },
+                           labelLine: {
+                normal: {
+                    lineStyle: {
+                        color: 'rgba(255, 255, 255, 0.3)'
+                    },
+                    
+                    length: 50,
+                    length2:10
+                }
+            },
+                    }
+				            },
+				            barWidth: '60%',
+				            data:[10091, 52032, 21400, 33564, 13900]
+				        }		        
+				    ]  
+				};
+			   myChart.setOption(option);
+			   var myChart = echarts.init(document.getElementById('tickekt2'));
+			     option = {
+			    tooltip : {
+			        trigger: 'item',
+			        formatter: "{a} <br/>{b} : {c} ({d}%)"
+			    },
+			    series : [
+			        {
+			           	name: '',
+			            type: 'pie',
+			            radius : '55%',
+			            center: ['50%', '60%'],
+			            data:[
+			                {value:11090, name:'app'},
+			                {value:52032, name:'微信'},
+			                {value:21400, name:'官网'},
+			                {value:33564, name:'电商'},
+			                {value:13900, name:'现场购票'}
+			            ],
+			            itemStyle: {
+			                emphasis: {
+			                    shadowBlur: 10,
+			                    shadowOffsetX: 0,
+			                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+			                },
+			                 normal: {
+　　　　　　　　　　　　　　//好，这里就是重头戏了，定义一个list，然后根据所以取得不同的值，这样就实现了，
+                        color: function(params) {
+                            // build a color map as your need.
+                            var colorList = [
+                              '#C1232B','#B5C334','blue','#E87C25','#27727B',              
+                            ];
+                            return colorList[params.dataIndex]
+                        },
+　　　　　　　　　　　　　　//以下为是否显示，显示位置和显示格式的设置了
+                        label: {
+                            show: true,
+                            position: 'top',
+                            align:'right',
+                            formatter: '{b}\({d}%)'
+                        }
+                    }          
+			            }
+			        }
+			    ]
+};
+			   myChart.setOption(option);
+			  }
+function drag(oDrag,max)
+{
+    var disX = dixY = 0;
+    oDrag.onmousedown = function (event)
+    {
+        var event = event || window.event;
+        disX = event.clientX - this.offsetLeft;
+        disY = event.clientY - this.offsetTop;        
+        
+        var oTemp = document.createElement("div");
+        oTemp["id"] = "tempbox";
+        oTemp.style.left = this.currentStyle ? this.currentStyle["left"] : getComputedStyle(this, null)["left"];
+        oTemp.style.top = this.currentStyle ? this.currentStyle["top"] : getComputedStyle(this, null)["top"];
+        oTemp.style.zIndex = zIndex++;
+        document.body.appendChild(oTemp);
+  
+        document.onmousemove = function (event)
+        {
+            var event = event || window.event;
+            var iL = event.clientX - disX;
+            var iT = event.clientY - disY;
+            var maxL = document.documentElement.clientWidth - oDrag.offsetWidth;
+            var maxT = document.documentElement.clientHeight - oDrag.offsetHeight
+            
+            iL <= 0 && (iL = 0);
+            iT <= 0 && (iT = 0);
+            iL >= maxL && (iL = maxL);
+            iT >= maxT && (iT = maxT);
+ 
+            if(max){ iL>=(max.maxX-oDrag.offsetWidth)&&(iL=(max.maxX-oDrag.offsetWidth));
+             iT>=(max.maxY-oDrag.offsetHeight)&&(iT=(max.maxY-oDrag.offsetHeight))
+            }
+            
+            oTemp.style.left = iL + "px";
+            oTemp.style.top = iT + "px";
+            return false;
+        };
+        
+        document.onmouseup = function ()
+        {
+            document.onmousemove = null;
+            document.onmouseup = null;
+            oDrag.style.left = oTemp.style.left;
+            oDrag.style.top = oTemp.style.top;
+            oDrag.style.zIndex = oTemp.style.zIndex;
+            document.body.removeChild(oTemp);
+            oDrag.releaseCapture && oDrag.releaseCapture()
+        };
+        
+        this.setCapture && this.setCapture();        
+        return false
+    }    
+    
+    
+}
+</script>
+ 
+</head><body>
+<div  class="pppp"  style="width:720px; height:400px; overflow:hidden; position:absolute; border:red 1px solid;">
+    <div id="tickekt1" style="width: 600px;height:400px; "></div>
+    <div id="drag1" ><div id="tickekt2" style="width:320px;height:180px;"></div>
+    </div>
+</div>
+</body>
+</html>
